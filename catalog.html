@@ -320,7 +320,10 @@
                     item.onclick = () => openOrderModal(p.name, p.price, p.options, [p.imgId].concat(p.imgIds || []), p.description);
                     grid.appendChild(item);
                 });
-            } catch (err) { console.error(err); grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px; color:#ff4d4d;">حدث خطأ أثناء التحميل.</div>'; }
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px; color:#ff4d4d;">حدث خطأ أثناء التحميل.</div>';
+            }
         }
 
         function openOrderModal(name, price, options, imgIds, description) {
