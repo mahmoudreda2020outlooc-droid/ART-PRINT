@@ -289,7 +289,7 @@
     </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
-    <script src="backend-config.js?v=1.0"></script>
+    <script src="backend-config.js?v=27000"></script>
     <script>
         const { Client, Databases, Storage, Query, ID } = Appwrite;
         const client = new Client().setEndpoint(APPWRITE_CONFIG.ENDPOINT).setProject(APPWRITE_CONFIG.PROJECT_ID);
@@ -321,8 +321,20 @@
                     grid.appendChild(item);
                 });
             } catch (err) {
-                console.error(err);
-                grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px; color:#ff4d4d;">حدث خطأ أثناء التحميل.</div>';
+                console.error('Fetch Error:', err);
+                let errorMsg = 'حدث خطأ أثناء تحميل المنتجات.';
+                if (err.code === 401 || err.code === 403) {
+                    errorMsg = 'خطأ في الصلاحيات (403): يرجى التأكد من تفعيل "Read" لمجموعة "Any" في Appwrite.';
+                } else if (err.message && err.message.includes('Network')) {
+                    errorMsg = 'خطأ في الاتصال بالإنترنت أو بالسيرفر.';
+                }
+                grid.innerHTML = `
+                    <div style="grid-column:1/-1; text-align:center; padding:50px;">
+                        <p style="color:#ff4d4d; font-size:1.2rem; margin-bottom:15px;">${errorMsg}</p>
+                        <button class="btn btn-glass" onclick="loadCategoryProducts('${categoryId}')">إعادة المحاولة</button>
+                        <p style="font-size: 0.8rem; color: #888; margin-top:20px;">Code: ${err.code || 'Unknown'}</p>
+                    </div>
+                `;
             }
         }
 
