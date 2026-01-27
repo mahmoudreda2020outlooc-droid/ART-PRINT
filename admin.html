@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | ART PRINT</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#ff7c4d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ART PRINT Admin">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=27000">
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
+    <style>
+        .admin-container {
+            padding: 120px 0 60px;
+            min-height: 100vh;
+        }
+
+        .auth-card {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard {
+            display: none;
+            /* Hidden initially */
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 20px;
+            background: var(--bg-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .img-preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .img-preview {
+            width: 100%;
+            height: 100px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px dashed var(--glass-border);
+        }
+
+        .item-thumbnail {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            object-fit: cover;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 50px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .products-table th,
+        .products-table td {
+            padding: 20px;
+            text-align: right;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .products-table th {
+            background: rgba(255, 124, 77, 0.1);
+            color: var(--secondary);
+        }
+
+        .action-btns i {
+            margin-left: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .delete-btn:hover {
+            color: #ff4d4d;
+        }
+
+        .edit-btn:hover {
+            color: var(--secondary);
+        }
+    </style>
+</head>
+
+<body style="background: var(--bg-color);">
+
+    <nav id="navbar" style="background: var(--bg-color); border-bottom: 1px solid var(--glass-border);">
+        <div class="container">
+            <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 10px;">
+                <img src="logo.png?v=10.0" alt="Logo" style="height: 50px; border-radius: 50%;">
+                <span>لوحة <span class="gradient-text">التحكم</span></span>
+            </a>
+            <button id="installBtn" class="btn btn-glass" style="display: none;" onclick="installPWA()">
+                <i class="fas fa-download"></i> تطبيق
+            </button>
+            <button id="logoutBtn" class="btn btn-glass" style="display: none;" onclick="logout()">خروج</button>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <div class="container">
+            <!-- Login Phase -->
+            <div id="loginPhase" class="auth-card">
+                <div class="selection-header">
+                    <h2 class="gradient-text">دخول المسؤول</h2>
+                    <p>يرجى إدخال بيانات الاعتماد</p>
+                </div>
+                <div class="form-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" id="adminEmail" class="form-input" placeholder="admin">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="adminPassword" class="form-input" placeholder="••••••••">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="login()">دخول</button>
+            </div>
+
+            <!-- Dashboard Phase -->
+            <div id="dashboardPhase" class="dashboard">
+
+                <div class="admin-tabs"
+                    style="margin-bottom: 50px; display: flex; gap: 20px; justify-content: center; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 50px; border: 1px solid var(--glass-border); max-width: 600px; margin-left: auto; margin-right: auto;">
+                    <button id="tab-products" class="btn btn-glass active"
+                        style="flex: 1; border-color: var(--secondary); background: rgba(255, 124, 77, 0.1);"
+                        onclick="switchTab('products')">
+                        <i class="fas fa-box"></i> إدارة المنتجات
+                    </button>
+                    <button id="tab-feedback" class="btn btn-glass" style="flex: 1;" onclick="switchTab('feedback')">
+                        <i class="fas fa-comments"></i> الشكاوى والاقتراحات
+                    </button>
+                </div>
+
+                <!-- Products Section -->
+                <div id="productsSection">
+                    <div class="section-title">
+                        <h1 class="gradient-text">إدارة المنتجات</h1>
+                    </div>
+
+                    <div class="auth-card" style="max-width: 600px;">
+                        <h3>أضف منتج جديد</h3>
+                        <div class="form-group">
+                            <label>اسم المنتج</label>
+                            <input type="text" id="pName" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>السعر (EGP)</label>
+                            <input type="number" id="pPrice" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>وصف المنتج (اختياري)</label>
+                            <textarea id="pDesc" class="form-input" rows="3"
+                                placeholder="اكتب تفاصيل المنتج هنا..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>القسم</label>
+                            <select id="pType" class="form-input" onchange="toggleOptions()">
+                                <option value="tshirts">تيشيرتات</option>
+                                <option value="hoodies">هوديز</option>
+                                <option value="magic-mugs">مجات سحرية</option>
+                                <option value="porcelain">مجات بورسلين</option>
+                                <option value="wallets">محافظ</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="optionsContainer">
+                            <label>المقاسات (افصل بينها بفاصلة)</label>
+                            <input type="text" id="pOptions" class="form-input" placeholder="S, M, L, XL">
+                        </div>
+                        <div class="form-group">
+                            <label>صور المنتج (يمكنك اختيار أكثر من صورة)</label>
+                            <input type="file" id="pImage" class="form-input" accept="image/*" multiple
+                                onchange="previewImg(event)">
+                            <div id="previewGrid" class="img-preview-container"></div>
+                        </div>
+                        <button id="addBtn" class="btn btn-primary" style="width: 100%;" onclick="uploadProduct()">رفع
+                            المنتج</button>
+                    </div>
+
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>المنتج</th>
+                                <th>السعر</th>
+                                <th>القسم</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsList">
+                            <!-- Dynamic list -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Feedback Section -->
+                <div id="feedbackSection" style="display: none;">
+                    <div class="section-title">
+                        <h1 class="gradient-text">وارد الرسائل</h1>
+                    </div>
+
+                    <div id="feedbackList" style="display: grid; gap: 20px;">
+                        <!-- Feedback items will be loaded here -->
+                        <p style="text-align: center; color: var(--text-secondary);">جاري التحميل...</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="backend-config.js?v=1.0"></script>
+    <script>
+        const { Client, Account, Databases, Storage, ID, Query, Permission, Role } = Appwrite;
+        const client = new Client().setEndpoint(APPWRITE_CONFIG.ENDPOINT).setProject(APPWRITE_CONFIG.PROJECT_ID);
+        const account = new Account(client);
+        const databases = new Databases(client);
+        const storage = new Storage(client);
+
+        // Check Session
+        checkSession();
+
+        async function checkSession() {
+            try {
+                await account.get();
+                showDashboard();
+            } catch (err) {
+                hideDashboard();
+            }
+        }
+
+        async function login() {
+            let emailOrUser = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (emailOrUser === 'admin') {
+                emailOrUser = 'admin@artprint.com';
+            }
+
+            try {
+                await account.createEmailSession(emailOrUser, password);
+                showDashboard();
+            } catch (err) {
+                alert('خطأ في الدخول: ' + err.message);
+            }
+        }
+
+        async function logout() {
+            await account.deleteSession('current');
+            location.reload();
+        }
+
+        function showDashboard() {
+            document.getElementById('loginPhase').style.display = 'none';
+            document.getElementById('dashboardPhase').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'block';
+            loadProducts();
+            loadFeedback();
+        }
+
+        function hideDashboard() {
+            document.getElementById('loginPhase').style.display = 'block';
+            document.getElementById('dashboardPhase').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'none';
+        }
+
+        function switchTab(tab) {
+            // Update buttons
+            document.querySelectorAll('.admin-tabs .btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.borderColor = 'var(--glass-border)';
+            });
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.getElementById(`tab-${tab}`).style.borderColor = 'var(--secondary)';
+
+            // Update sections
+            if (tab === 'products') {
+                document.getElementById('productsSection').style.display = 'block';
+                document.getElementById('feedbackSection').style.display = 'none';
+            } else {
+                document.getElementById('productsSection').style.display = 'none';
+                document.getElementById('feedbackSection').style.display = 'block';
+                loadFeedback(); // Reload feedback when tab is active
+            }
+        }
+
+        function previewImg(e) {
+            const grid = document.getElementById('previewGrid');
+            grid.innerHTML = '';
+            Array.from(e.target.files).forEach(file => {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'img-preview';
+                grid.appendChild(img);
+            });
+        }
+
+        function toggleOptions() {
+            const type = document.getElementById('pType').value;
+            const container = document.getElementById('optionsContainer');
+            // Show options only for Clothes (tshirts, hoodies)
+            if (type === 'tshirts' || type === 'hoodies') {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        // Initialize visibility
+        window.onload = function () {
+            checkSession();
+            toggleOptions();
+        };
+
+        async function uploadProduct() {
+            const name = document.getElementById('pName').value;
+            const price = document.getElementById('pPrice').value;
+            const desc = document.getElementById('pDesc').value; // New Description
+            const type = document.getElementById('pType').value;
+
+            // Get options only if visible
+            let options = [];
+            if (document.getElementById('optionsContainer').style.display !== 'none') {
+                const optStr = document.getElementById('pOptions').value;
+                if (optStr) options = optStr.split(',').map(s => s.trim()).filter(s => s);
+            }
+
+            const files = document.getElementById('pImage').files;
+
+            if (!name || !price || files.length === 0) return alert('برجاء ملء كافة البيانات واختيار صورة واحدة على الأقل');
+
+            try {
+                const addBtn = document.getElementById('addBtn');
+                const originalText = addBtn.innerText;
+                addBtn.innerText = 'جاري الرفع...';
+                addBtn.disabled = true;
+
+                // 1. Upload All Images
+                const imgIds = [];
+                for (const file of files) {
+                    const uploadedFile = await storage.createFile(APPWRITE_CONFIG.BUCKET_ID, ID.unique(), file);
+                    imgIds.push(uploadedFile.$id);
+                }
+
+                // 2. Create Database Entry
+                await databases.createDocument(
+                    APPWRITE_CONFIG.DATABASE_ID,
+                    APPWRITE_CONFIG.COLLECTION_ID,
+                    ID.unique(),
+                    {
+                        name,
+                        price: parseInt(price),
+                        description: desc, // Save Description
+                        type,
+                        imgId: imgIds[0],
+                        imgIds: imgIds,
+                        options
+                    },
+                    [Permission.read(Role.any())]
+                );
+
+                alert('تم رفع المنتج بنجاح!');
+                location.reload();
+            } catch (err) {
+                alert('حدث خطأ: ' + err.message);
+                const addBtn = document.getElementById('addBtn'); // Re-select to be safe
+                addBtn.innerText = 'رفع المنتج';
+                addBtn.disabled = false;
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                const response = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTION_ID);
+                const list = document.getElementById('productsList');
+                list.innerHTML = '';
+
+                response.documents.forEach(p => {
+                    const tr = document.createElement('tr');
+                    const thumbUrl = storage.getFileView(APPWRITE_CONFIG.BUCKET_ID, p.imgId);
+
+                    // Name Col
+                    const tdName = document.createElement('td');
+                    tdName.innerHTML = `<img src="${thumbUrl}" class="item-thumbnail"> ${p.name}`;
+
+                    // Price Col
+                    const tdPrice = document.createElement('td');
+                    tdPrice.innerText = `${p.price} EGP`;
+
+                    // Type Col
+                    const tdType = document.createElement('td');
+                    tdType.innerText = p.type;
+
+                    // Actions Col
+                    const tdAction = document.createElement('td');
+                    tdAction.className = 'action-btns';
+
+                    const delBtn = document.createElement('i');
+                    delBtn.className = 'fas fa-trash delete-btn';
+                    delBtn.onclick = () => deleteProduct(p.$id, p.imgIds || [p.imgId]);
+
+                    tdAction.appendChild(delBtn);
+
+                    tr.appendChild(tdName);
+                    tr.appendChild(tdPrice);
+                    tr.appendChild(tdType);
+                    tr.appendChild(tdAction);
+
+                    list.appendChild(tr);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadFeedback() {
+            try {
+                const response = await databases.listDocuments(
+                    APPWRITE_CONFIG.DATABASE_ID,
+                    APPWRITE_CONFIG.FEEDBACK_COLLECTION_ID,
+                    [Query.orderDesc('date')]
+                );
+
+                const list = document.getElementById('feedbackList');
+                list.innerHTML = '';
+
+                if (response.documents.length === 0) {
+                    list.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">لا توجد رسائل جديدة</p>';
+                    return;
+                }
+
+                response.documents.forEach(msg => {
+                    const card = document.createElement('div');
+                    card.style.background = 'var(--card-bg)';
+                    card.style.padding = '20px';
+                    card.style.borderRadius = '15px';
+                    card.style.border = '1px solid var(--glass-border)';
+                    card.style.position = 'relative';
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span style="background: rgba(255,124,77,0.1); color: var(--secondary); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem;">${msg.type}</span>
+                            <span style="color: var(--text-secondary); font-size: 0.8rem;">${new Date(msg.date).toLocaleDateString('ar-EG')}</span>
+                        </div>
+                        <h4 style="margin: 0 0 5px 0; color: #fff;">${msg.name}</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">${msg.contact}</p>
+                        <p style="color: var(--text-primary); line-height: 1.6; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px;">${msg.message}</p>
+                        <i class="fas fa-trash delete-btn" style="position: absolute; bottom: 20px; left: 20px;" onclick="deleteFeedback('${msg.$id}')"></i>
+                    `;
+                    list.appendChild(card);
+                });
+            } catch (err) {
+                console.error(err);
+                if (document.getElementById('feedbackSection').style.display !== 'none') {
+                    // Only show alert if user is actively looking at feedback tab
+                    // to avoid confusing alerts on initial load if collection missing
+                    // document.getElementById('feedbackList').innerHTML = '<p style="color: red; text-align: center;">يرجى إنشاء Collection باسم "feedback" في Appwrite</p>';
+                }
+            }
+        }
+
+        async function deleteFeedback(id) {
+            if (!confirm('هل تريد مسح هذه الرسالة؟')) return;
+            try {
+                await databases.deleteDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.FEEDBACK_COLLECTION_ID, id);
+                loadFeedback();
+            } catch (err) {
+                alert('خطأ في الحذف');
+            }
+        }
+
+        async function deleteProduct(id, imgIds) {
+            if (!confirm('هل أنت متأكد من مسح هذا المنتج؟')) return;
+            try {
+                await databases.deleteDocument(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTION_ID, id);
+                // Delete all associated files
+                for (const fileId of imgIds) {
+                    try { await storage.deleteFile(APPWRITE_CONFIG.BUCKET_ID, fileId); } catch (e) { }
+                }
+                loadProducts();
+            } catch (err) {
+                alert('خطأ في الحذف: ' + err.message);
+            }
+        }
+    </script>
+    <!-- PWA Installation Logic -->
+    <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed'));
+            });
+        }
+
+        // Install Button Logic
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Update UI to notify the user they can add to home screen
+            installBtn.style.display = 'block';
+        });
+
+        async function installPWA() {
+            if (deferredPrompt) {
+                // Show the prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                // We've used the prompt, can't use it again
+                deferredPrompt = null;
+                // Disable/Hide the button
+                installBtn.style.display = 'none';
+            }
+        }
+
+        window.addEventListener('appinstalled', () => {
+            // Hide the app-provided install promotion
+            installBtn.style.display = 'none';
+            console.log('PWA was installed');
+        });
+    </script>
+</body>
+
+</html>

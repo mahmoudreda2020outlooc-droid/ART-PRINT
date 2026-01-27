@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معمل التصميم الذكي | ART PRINT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="updated-style.css?v=13.0">
+    <style>
+        .design-lab {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            height: calc(100vh - 80px);
+            margin-top: 80px;
+            background: var(--bg-color);
+        }
+
+        .preview-area {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #2d3748 0%, #0d1117 100%);
+            overflow: hidden;
+            padding: 40px;
+        }
+
+        .product-mockup {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            transition: transform 0.5s ease;
+            background-color: #ffffff;
+            /* This will be the dynamic color */
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .product-base {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.1));
+            mix-blend-mode: multiply;
+            /* Crucial for realistic coloring */
+        }
+
+        .user-design-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 180px;
+            height: 180px;
+            cursor: move;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px dashed transparent;
+        }
+
+        .user-design-container:hover {
+            border-color: var(--secondary);
+        }
+
+        #user-image {
+            max-width: 100%;
+            max-height: 100%;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .controls-area {
+            background: var(--card-bg);
+            padding: 30px;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            z-index: 10;
+            color: var(--text-primary);
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group h4 {
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+
+        .product-select {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .prod-btn {
+            padding: 10px;
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+            background: var(--bg-color);
+            color: var(--text-primary);
+        }
+
+        .prod-btn.active {
+            border-color: var(--secondary);
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 10px;
+        }
+
+        .color-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+
+        .color-circle.active {
+            border-color: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--glass-border);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            background: var(--bg-color);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--secondary);
+            background: rgba(255, 107, 53, 0.05);
+        }
+
+        @media (max-width: 992px) {
+            .design-lab {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .preview-area {
+                height: 400px;
+            }
+
+            .product-mockup {
+                width: 300px;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav id="navbar" style="background: var(--bg-color); border-bottom: 1px solid var(--glass-border);">
+        <div class="container">
+            <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 10px;">
+                <img src="logo.png?v=13.0" alt="Logo" style="height: 50px; border-radius: 50%;">
+                <span>ART <span class="gradient-text">PRINT</span></span>
+            </a>
+            <a href="catalog.html" class="btn btn-glass">العودة للكتالوج</a>
+        </div>
+    </nav>
+
+    <div class="design-lab">
+        <!-- Preview -->
+        <div class="preview-area">
+            <div class="product-mockup" id="product-container">
+                <img src="tshirt-base.png" id="base-image" class="product-base">
+                <div class="user-design-container" id="draggable-design">
+                    <img id="user-image" src="" style="display: none;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-area">
+            <div class="control-group">
+                <h4>١. اختار المنتج</h4>
+                <div class="product-select">
+                    <div class="prod-btn active" onclick="changeProduct('tshirt')">تيشيرت</div>
+                    <div class="prod-btn" onclick="changeProduct('hoodie')">هودى</div>
+                    <div class="prod-btn" onclick="changeProduct('mug')">مج</div>
+                    <div class="prod-btn" onclick="changeProduct('wallet')">محفظة</div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h4>٢. لون المنتج</h4>
+                <div class="color-picker">
+                    <div class="color-circle active" style="background: #ffffff; border: 1px solid #ddd;"
+                        onclick="changeColor('#ffffff')"></div>
+                    <div class="color-circle" style="background: #000000;" onclick="changeColor('#333333')"></div>
+                    <div class="color-circle" style="background: #1B365D;" onclick="changeColor('#1B365D')"></div>
+                    <div class="color-circle" style="background: #FF6B35;" onclick="changeColor('#FF6B35')"></div>
+                    <div class="color-circle" style="background: #ff0000;" onclick="changeColor('#ff0000')"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h4>٣. ارفع تصميمك (لوجو أو صورة)</h4>
+                <input type="file" id="file-input" style="display: none;" accept="image/*">
+                <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--secondary);"></i>
+                    <p>اضغط هنا لرفع الصورة</p>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h4>٤. مكان الطباعة</h4>
+                <select class="btn"
+                    style="width: 100%; text-align: right; background: var(--bg-color); border: 1px solid var(--glass-border); color: var(--text-primary);">
+                    <option>الصدر (منتصف)</option>
+                    <option>الظهر (كامل)</option>
+                    <option>الصدر (شمال صغير)</option>
+                </select>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="orderNow()">
+                <i class="fab fa-whatsapp"></i> اعتمد التصميم واطلب الآن
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const userImage = document.getElementById('user-image');
+        const draggable = document.getElementById('draggable-design');
+        const baseImage = document.getElementById('base-image');
+        const productContainer = document.getElementById('product-container');
+
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+
+        // Image Upload
+        fileInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    userImage.src = event.target.result;
+                    userImage.style.display = 'block';
+                    draggable.style.left = '50%';
+                    draggable.style.top = '50%';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Dragging Logic
+        draggable.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', stopDrag);
+
+        function startDrag(e) {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            initialLeft = draggable.offsetLeft;
+            initialTop = draggable.offsetTop;
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            draggable.style.left = `${initialLeft + dx}px`;
+            draggable.style.top = `${initialTop + dy}px`;
+        }
+
+        function stopDrag() {
+            isDragging = false;
+        }
+
+        // Product Switching
+        function changeProduct(type) {
+            document.querySelectorAll('.prod-btn').forEach(b => b.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            if (type === 'tshirt') {
+                baseImage.src = "tshirt-base.png";
+                draggable.style.width = "220px";
+                draggable.style.height = "220px";
+            }
+            // ... (other products remain same or can be updated with similar high-quality bases)
+            if (type === 'hoodie') {
+                baseImage.src = "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800";
+                draggable.style.width = "180px";
+                draggable.style.height = "180px";
+            }
+            if (type === 'mug') {
+                baseImage.src = "https://images.unsplash.com/photo-1517256673644-36ad11246d21?q=80&w=800";
+                draggable.style.width = "130px";
+                draggable.style.height = "130px";
+            }
+            if (type === 'wallet') {
+                baseImage.src = "https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=800";
+                draggable.style.width = "110px";
+                draggable.style.height = "110px";
+            }
+        }
+
+        // Professional Color Changing Logic
+        function changeColor(hex) {
+            document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Change the background color of the container
+            // The product-base with mix-blend-mode: multiply will 'pick up' this color
+            productContainer.style.backgroundColor = hex;
+
+            // Adjust brightness for white to keep it from looking 'flat'
+            if (hex === '#ffffff') {
+                baseImage.style.filter = "brightness(1)";
+            } else {
+                baseImage.style.filter = "brightness(1.1)"; // Pop shadows
+            }
+        }
+
+        function orderNow() {
+            const product = document.querySelector('.prod-btn.active').innerText;
+            window.open(`https://wa.me/201021729633?text=أريد طلب هذا التصميم لـ ${product}`, '_blank');
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كتالوج المنتجات | ART PRINT - تيشيرتات، مجات، هوديز</title>
+    <meta name="description"
+        content="تصفح كتالوج ART PRINT الكامل. تشكيلة واسعة من التيشيرتات، المجات السحرية، الهوديز، والمحافظ. خامات عالية الجودة وطباعة تدوم. اطلب الآن!">
+    <meta name="keywords"
+        content="كتالوج ارت برينت, اسعار الطباعة, تيشيرتات مطبوعة, مجات سحرية, هوديز كاستم, محافظ جلد مطبوعة">
+    <meta name="author" content="ART PRINT">
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mahmoudreda2020outlooc-droid.github.io/ART-PRINT/catalog.html">
+    <meta property="og:title" content="كتالوج منتجات ART PRINT | اختر تصميمك">
+    <meta property="og:description" content="شوف كل منتجاتنا وأسعارنا في مكان واحد. تيشيرتات، مجات، هوديز، وأكتر.">
+    <meta property="og:image" content="https://mahmoudreda2020outlooc-droid.github.io/ART-PRINT/logo.png">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "ART PRINT Catalog",
+      "description": "Browse our collection of custom printed t-shirts, mugs, and hoodies.",
+      "url": "https://mahmoudreda2020outlooc-droid.github.io/ART-PRINT/catalog.html",
+      "provider": {
+        "@type": "LocalBusiness",
+        "name": "ART PRINT",
+        "image": "https://mahmoudreda2020outlooc-droid.github.io/ART-PRINT/logo.png"
+      }
+    }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=31000">
+    <style>
+        .catalog-container {
+            padding: 120px 0 60px;
+            min-height: 100vh;
+        }
+
+        .gallery-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .nav-card {
+            background: var(--card-bg);
+            padding: 30px 20px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid var(--glass-border);
+            color: var(--text-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-card:hover {
+            border-color: var(--secondary);
+            background: rgba(255, 107, 53, 0.05);
+            box-shadow: 0 0 20px rgba(255, 124, 77, 0.3), inset 0 0 10px rgba(255, 124, 77, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .nav-card.active {
+            border-color: var(--secondary);
+            background: rgba(255, 107, 53, 0.15);
+            box-shadow: 0 0 30px rgba(255, 124, 77, 0.5), inset 0 0 15px rgba(255, 124, 77, 0.2);
+        }
+
+        .nav-card i,
+        .nav-card img {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 0 0px transparent);
+        }
+
+        .nav-card:hover i,
+        .nav-card:hover img {
+            filter: drop-shadow(0 0 15px var(--secondary)) drop-shadow(0 0 30px rgba(255, 124, 77, 0.3));
+            transform: translateY(-8px) scale(1.1);
+        }
+
+        .nav-card.active i,
+        .nav-card.active img {
+            filter: drop-shadow(0 0 15px var(--secondary)) drop-shadow(0 0 30px rgba(255, 124, 77, 0.2));
+            transform: scale(1.1);
+        }
+
+        .nav-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .modal-input {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        /* THE "DATA ON RIGHT, REST ON LEFT" MASTER LAYOUT */
+        .selection-content {
+            display: flex !important;
+            flex-direction: row !important;
+            height: 90vh !important;
+            overflow: hidden !important;
+        }
+
+        .modal-data-side {
+            flex: 0.8 !important;
+            padding: 30px;
+            background: rgba(255, 124, 77, 0.05);
+            border-left: 1px solid var(--glass-border);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .modal-main-side {
+            flex: 1.5 !important;
+            padding: 30px;
+            overflow-y: auto;
+            background: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* IMAGE ZOOM MODAL (LIGHTBOX) */
+        .zoom-modal {
+            display: none;
+            position: fixed;
+            z-index: 5000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(15px);
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .zoom-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            cursor: default;
+            transition: 0.3s;
+        }
+
+        .close-zoom {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: #fff;
+            font-size: 3rem;
+            cursor: pointer;
+            z-index: 5100;
+            transition: 0.3s;
+        }
+
+        .close-zoom:hover {
+            transform: scale(1.2);
+            color: var(--secondary);
+        }
+
+        .product-info-block {
+            background: rgba(255, 124, 77, 0.15) !important;
+            border-radius: 15px;
+            padding: 22px;
+            border: 2px solid var(--secondary);
+            border-right: 12px solid var(--secondary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            direction: rtl;
+            text-align: right;
+            width: 100%;
+        }
+
+        .data-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .data-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .data-row i {
+            color: var(--secondary);
+            font-size: 1.4rem;
+            margin-top: 4px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .data-label {
+            font-weight: 900;
+            color: var(--secondary);
+            margin-left: 5px;
+            font-size: 1.2rem;
+        }
+
+        .data-value {
+            color: #fff;
+            line-height: 1.6;
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        .close-selection {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 10000;
+            font-size: 2.5rem;
+            color: #fff;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.7);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 992px) {
+            .selection-content {
+                flex-direction: column !important;
+                height: 95vh !important;
+            }
+
+            .modal-data-side {
+                flex: none !important;
+                border-left: none;
+                border-bottom: 1px solid var(--glass-border);
+                padding: 20px;
+            }
+
+            .modal-main-side {
+                flex: 1 !important;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body style="background: var(--bg-color);">
+    <nav id="navbar" style="background: var(--bg-color); border-bottom: 1px solid var(--glass-border);">
+        <div class="container">
+            <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 10px;">
+                <img src="logo.png" alt="Logo" style="height: 50px; border-radius: 50%;">
+                <span>ART <span class="gradient-text">PRINT</span></span>
+            </a>
+            <a href="index.html" class="btn btn-glass">الرجوع للرئيسية</a>
+        </div>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
+    <script src="backend-config.js?v=1.0"></script>
+    <script>
+        const { Client, Databases, Storage, Query, ID } = Appwrite;
+        const client = new Client().setEndpoint(APPWRITE_CONFIG.ENDPOINT).setProject(APPWRITE_CONFIG.PROJECT_ID);
+        const databases = new Databases(client);
+        const storage = new Storage(client);
+
+        let currentOrder = { name: '', price: 0, option: '' };
+
+        document.addEventListener('DOMContentLoaded', () => { loadCategoryProducts('tshirts'); });
+
+        function showGallery(categoryId) {
+            document.querySelectorAll('.nav-card').forEach(card => card.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            loadCategoryProducts(categoryId);
+        }
+
+        async function loadCategoryProducts(categoryId) {
+            const grid = document.getElementById('dynamicGrid');
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 50px;">جاري التحميل...</div>';
+            try {
+                const response = await databases.listDocuments(APPWRITE_CONFIG.DATABASE_ID, APPWRITE_CONFIG.COLLECTION_ID, [Query.equal('type', categoryId)]);
+                grid.innerHTML = '';
+                response.documents.forEach(p => {
+                    const imgUrl = storage.getFileView(APPWRITE_CONFIG.BUCKET_ID, p.imgId);
+                    const item = document.createElement('div');
+                    item.className = 'work-item';
+                    item.innerHTML = `<div class="work-item-img-container"><span class="price-badge">${p.price} EGP</span><img src="${imgUrl}"></div><div class="work-item-info"><h4>${p.name}</h4><button class="order-mini-btn">اطلب</button></div>`;
+                    item.onclick = () => openOrderModal(p.name, p.price, p.options, [p.imgId].concat(p.imgIds || []), p.description);
+                    grid.appendChild(item);
+                });
+            } catch (err) { console.error(err); grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px; color:#ff4d4d;">حدث خطأ أثناء التحميل.</div>'; }
+        }
+
+        function openOrderModal(name, price, options, imgIds, description) {
+            currentOrder = { name, price, option: options && options.length > 0 ? options[0] : 'Standard' };
+            document.getElementById('modalTitle').innerText = name;
+
+            const htmlContent = `
+                <div class="data-row">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <div><span class="data-label">السعر:</span> <span class="data-value" style="font-size: 1.8rem; font-weight: 950; color: var(--secondary);">${price} EGP</span></div>
+                </div>
+                <div class="data-row">
+                    <i class="fas fa-info-circle"></i>
+                    <div><span class="data-label">الوصف:</span> <span class="data-value">${description || 'منتج احترافي من ART PRINT'}</span></div>
+                </div>
+                <div class="data-row" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; margin-top: 10px;">
+                    <i class="fas fa-check-double" style="color: #2ecc71;"></i>
+                    <div><span class="data-label" style="color: #2ecc71;">ملاحظة:</span> <span class="data-value" style="color: #2ecc71; font-weight: 850;">متاح تغيير التصميم بأي تصميم آخر على نفس المنتج</span></div>
+                </div>
+            `;
+
+            const sideBlock = document.getElementById('sideProductInfo');
+            if (sideBlock) sideBlock.innerHTML = htmlContent;
+
+            const mainImg = document.getElementById('modalPreviewImg');
+            mainImg.src = storage.getFileView(APPWRITE_CONFIG.BUCKET_ID, imgIds[0]);
+
+            const thumbContainer = document.getElementById('modalGallery');
+            thumbContainer.innerHTML = '';
+            if (imgIds.length > 1) {
+                imgIds.forEach(id => {
+                    const url = storage.getFileView(APPWRITE_CONFIG.BUCKET_ID, id);
+                    const thumb = document.createElement('img');
+                    thumb.src = url; thumb.className = 'modal-thumb';
+                    thumb.onclick = () => { mainImg.src = url; };
+                    thumbContainer.appendChild(thumb);
+                });
+                thumbContainer.style.display = 'flex';
+            } else { thumbContainer.style.display = 'none'; }
+
+            const optGrid = document.getElementById('optionsGrid');
+            optGrid.innerHTML = '';
+            if (options && options.length > 0) {
+                options.forEach((opt, index) => {
+                    const btn = document.createElement('div');
+                    btn.className = `option-btn ${index === 0 ? 'active' : ''}`;
+                    btn.innerText = opt;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active'); currentOrder.option = opt;
+                    };
+                    optGrid.appendChild(btn);
+                });
+            }
+            document.getElementById('selectionModal').style.display = 'flex';
+        }
+
+        function openZoomModal() {
+            const src = document.getElementById('modalPreviewImg').src;
+            const zoomImg = document.getElementById('zoomImg');
+            zoomImg.src = src;
+            document.getElementById('imageZoomModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeZoomModal() {
+            document.getElementById('imageZoomModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeOrderModal() { document.getElementById('selectionModal').style.display = 'none'; }
+
+        let currentUploadPromise = null;
+        let uploadedFileUrl = '';
+        async function handleFileSelect(input) {
+            if (input.files.length === 0) return;
+            const file = input.files[0];
+            const statusLabel = document.getElementById('fileName');
+            statusLabel.innerHTML = `جاري التجهيز...`;
+            currentUploadPromise = storage.createFile(APPWRITE_CONFIG.BUCKET_ID, ID.unique(), file)
+                .then(response => {
+                    uploadedFileUrl = storage.getFileView(APPWRITE_CONFIG.BUCKET_ID, response.$id);
+                    statusLabel.innerHTML = `تم التجهيز ✅`;
+                    statusLabel.style.color = '#4caf50';
+                    return uploadedFileUrl;
+                }).catch(err => {
+                    console.error(err);
+                    statusLabel.innerHTML = `فشل التجهيز`;
+                    statusLabel.style.color = '#ff4d4d';
+                    alert(`حدث خطأ أثناء رفع الصورة:\n${err.message}\n\nيرجى التأكد من إعدادات Storage Bucket والصلاحيات.`);
+                    return null;
+                });
+        }
+
+        async function confirmOrder() {
+            const name = document.getElementById('cName').value;
+            const phone = document.getElementById('cPhone').value;
+            const address = document.getElementById('cAddress').value;
+            const note = document.getElementById('cNote').value;
+            if (!name || !phone || !address) { alert('برجاء كتابة الاسم والعنوان ورقم الهاتف!'); return; }
+            let finalFileUrl = uploadedFileUrl;
+            if (!finalFileUrl && currentUploadPromise) {
+                finalFileUrl = await currentUploadPromise || 'لا يوجد';
+            }
+            const message = `مرحباً ART PRINT، طلب جديد!\n📦 المنتج: ${currentOrder.name}\n💰 السعر: ${currentOrder.price} EGP\n📏 المقاس: ${currentOrder.option}\n👤 الاسم: ${name}\n📱 الهاتف: ${phone}\n📍 العنوان: ${address}\n💡 التفاصيل:\n${note || 'لا يوجد'}\n📎 التصميم: ${finalFileUrl || 'لا يوجد'}`;
+            window.open(`https://wa.me/201021729633?text=${encodeURIComponent(message)}`, '_blank');
+            closeOrderModal();
+        }
+    </script>
+
+    <div class="catalog-container">
+        <div class="container">
+            <div class="section-title">
+                <h1 class="gradient-text">معرض أعمالنا</h1>
+                <p style="font-size: 1.4rem; font-weight: 800; color: var(--secondary); margin-top: 10px;">نطبع شغفك</p>
+                <p>اختار القسم اللي حابب تشوف شغلنا فيه</p>
+            </div>
+            <div class="gallery-nav">
+                <div class="nav-card active" onclick="showGallery('tshirts')"><i class="fas fa-tshirt"></i>
+                    <h3>التيشيرتات</h3>
+                </div>
+                <div class="nav-card" onclick="showGallery('hoodies')"><img src="hoodie-icon.png"
+                        style="width:40px; height:40px; margin-bottom:10px; margin-left:auto; margin-right:auto; display:block;"
+                        alt="Hoodies">
+                    <h3>الهوديز</h3>
+                </div>
+                <div class="nav-card" onclick="showGallery('magic-mugs')"><i class="fas fa-magic"></i>
+                    <h3>مجات سحرية</h3>
+                </div>
+                <div class="nav-card" onclick="showGallery('porcelain')"><i class="fas fa-mug-hot"></i>
+                    <h3>مجات بورسلين</h3>
+                </div>
+                <div class="nav-card" onclick="showGallery('wallets')"><i class="fas fa-wallet"></i>
+                    <h3>المحافظ</h3>
+                </div>
+            </div>
+            <div id="dynamicGrid" class="gallery-grid active"></div>
+        </div>
+    </div>
+
+    <div id="selectionModal" class="selection-modal">
+        <div class="selection-content">
+            <span class="close-selection" onclick="closeOrderModal()">&times;</span>
+
+            <!-- COLUMN 1 (RIGHT SIDE): EXCLUSIVE PRODUCT DATA BLOCK ONLY -->
+            <div class="modal-data-side">
+                <!-- BRANDED MODAL HEADER -->
+                <div
+                    style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; border-bottom: 2px solid var(--secondary); padding-bottom: 15px;">
+                    <img src="logo.png"
+                        style="height: 50px; border-radius: 50%; border: 2px solid var(--secondary); box-shadow: 0 0 15px rgba(255, 124, 77, 0.4);">
+                    <div style="text-align: right;">
+                        <h3 style="color: #fff; margin: 0; font-size: 1.4rem; font-weight: 800; line-height: 1;">ART
+                            PRINT</h3>
+                        <p style="color: var(--secondary); margin: 5px 0 0 0; font-size: 0.9rem; font-weight: 700;">
+                            إبداع لا يتوقف</p>
+                    </div>
+                </div>
+                <div id="sideProductInfo" class="product-info-block">جاري التحميل...</div>
+            </div>
+
+            <!-- COLUMN 2 (LEFT SIDE): EVERYTHING ELSE (IMAGE, TITLE, OPTIONS, FORM) -->
+            <div class="modal-main-side">
+                <div
+                    style="background: #000; padding: 25px; border-radius: 20px; margin-bottom: 35px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+                    <img id="modalPreviewImg" src=""
+                        style="max-height: 450px; max-width: 100%; object-fit: contain; border-radius: 15px; cursor: zoom-in;"
+                        onclick="openZoomModal()">
+                    <div id="modalGallery" class="modal-gallery"></div>
+                </div>
+
+                <h2 id="modalTitle"
+                    style="font-weight: 900; color: var(--secondary); margin-bottom: 30px; font-size: 1.8rem; text-align: right; letter-spacing: 0.5px;">
+                    اسم المنتج</h2>
+
+                <div class="option-group">
+                    <label
+                        style="font-size: 1.1rem; color: #fff; margin-bottom: 15px; display: block; text-align: right; font-weight: 700;">اختار
+                        المقاس المناسب:</label>
+                    <div id="optionsGrid" class="options-grid"></div>
+                </div>
+
+                <div class="customer-form"
+                    style="margin-top:40px; border-top:2px solid rgba(255,255,255,0.05); padding-top:30px;">
+                    <h4 style="color: #aaa; margin-bottom: 20px; text-align: right;">بيانات الشحن وفكرتك:</h4>
+                    <input type="text" id="cName" class="modal-input" placeholder="الاسم بالكامل">
+                    <input type="tel" id="cPhone" class="modal-input" placeholder="رقم الهاتف">
+                    <input type="text" id="cAddress" class="modal-input" placeholder="العنوان بالتفصيل">
+                    <textarea id="cNote" class="modal-input" rows="4"
+                        placeholder="اكتب تفاصيل التصميم او اكتب نفس المنتج بنفس التصميم بالظبط"></textarea>
+
+                    <div
+                        style="background:rgba(255,124,77,0.05); border:2px dashed var(--secondary); padding:25px; border-radius:20px; text-align:center; margin-bottom: 25px;">
+                        <label for="cFile" style="cursor:pointer; display:block;"><i class="fas fa-cloud-upload-alt"
+                                style="color:var(--secondary); font-size: 2.5rem;"></i>
+                            <p style="margin:12px 0 0 0; font-size:1.1rem; font-weight: 800; color: var(--secondary);">
+                                ارفع صورة التصميم</p><input type="file" id="cFile" style="display:none;"
+                                onchange="handleFileSelect(this)">
+                        </label>
+                        <p id="fileName" style="font-size:1rem; color: #4caf50; margin-top:10px; font-weight: 800;"></p>
+                    </div>
+                </div>
+
+                <div class="selection-footer"><button class="btn btn-primary"
+                        style="width: 100%; font-size: 1.4rem; padding: 18px; font-weight: 800; transition: 0.3s;"
+                        onclick="confirmOrder()"><i class="fab fa-whatsapp"></i> إرسال الطلب عبر واتساب</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMAGE ZOOM MODAL (LIGHTBOX) -->
+    <div id="imageZoomModal" class="zoom-modal" onclick="closeZoomModal()">
+        <span class="close-zoom">&times;</span>
+        <img id="zoomImg" class="zoom-content">
+    </div>
+    <footer
+        style="padding: 40px 0; background: var(--bg-color); border-top: 1px solid var(--glass-border); margin-top: 50px;">
+        <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">جميع الحقوق محفوظة &copy; 2024 ART
+                PRINT</p>
+            <div
+                style="display: flex; align-items: center; gap: 12px; padding: 10px 20px; background: rgba(255,124,77,0.05); border-radius: 50px; border: 1px solid var(--secondary);">
+                <img src="dev-logo.png" alt="Developer Logo"
+                    style="height: 25px; border-radius: 4px; cursor: zoom-in; transition: 0.3s;"
+                    onclick="window.open('dev-logo.png', '_blank')" onmouseover="this.style.transform='scale(1.1)'"
+                    onmouseout="this.style.transform='scale(1)'">
+                <p style="margin: 0; font-size: 0.85rem; color: #fff; font-weight: 700;">صُمم وبُرمج بواسطة <a
+                        href="https://wa.me/201004897420" target="_blank"
+                        style="color: var(--secondary); text-decoration: none;">محمود رضا</a></p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
