@@ -331,8 +331,13 @@
                 grid.innerHTML = `
                     <div style="grid-column:1/-1; text-align:center; padding:50px;">
                         <p style="color:#ff4d4d; font-size:1.2rem; margin-bottom:15px;">${errorMsg}</p>
-                        <button class="btn btn-glass" onclick="loadCategoryProducts('${categoryId}')">إعادة المحاولة</button>
-                        <p style="font-size: 0.8rem; color: #888; margin-top:20px;">Code: ${err.code || 'Unknown'}</p>
+                        <button class="btn btn-glass" onclick="loadCategoryProducts('${categoryId}')" style="margin-bottom: 20px;">إعادة المحاولة</button>
+                        <div style="font-size: 0.7rem; color: #888; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; text-align: left; direction: ltr;">
+                            <strong>Diagnostic Info:</strong><br>
+                            Code: ${err.code || 'None'}<br>
+                            Message: ${err.message || 'No message'}<br>
+                            Type: ${err.type || 'Generic'}
+                        </div>
                     </div>
                 `;
             }

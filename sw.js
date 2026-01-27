@@ -1,5 +1,5 @@
 // Service Worker for ART PRINT Admin PWA
-const CACHE_NAME = 'artprint-admin-v2';
+const CACHE_NAME = 'artprint-admin-v3';
 const urlsToCache = [
     '/admin.html',
     '/style.css',
