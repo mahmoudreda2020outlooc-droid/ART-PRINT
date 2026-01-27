@@ -145,7 +145,7 @@
                 </div>
                 <div class="form-group">
                     <label>اسم المستخدم</label>
-                    <input type="text" id="adminEmail" class="form-input" placeholder="admin">
+                    <input type="text" id="adminEmail" class="form-input" placeholder="اسم الحساب">
                 </div>
                 <div class="form-group">
                     <label>كلمة المرور</label>
@@ -231,13 +231,20 @@
 
                 <!-- Feedback Section -->
                 <div id="feedbackSection" style="display: none;">
-                    <div class="section-title">
+                    <div class="section-title"
+                        style="display: flex; justify-content: space-between; align-items: center;">
                         <h1 class="gradient-text">وارد الرسائل</h1>
+                        <button class="btn btn-glass" onclick="loadFeedback()" title="تحديث الرسائل">
+                            <i class="fas fa-sync-alt"></i> تحديث
+                        </button>
                     </div>
 
                     <div id="feedbackList" style="display: grid; gap: 20px;">
                         <!-- Feedback items will be loaded here -->
-                        <p style="text-align: center; color: var(--text-secondary);">جاري التحميل...</p>
+                        <div class="loading-spinner" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--secondary);"></i>
+                            <p style="margin-top: 10px; color: var(--text-secondary);">جاري تحميل الرسائل...</p>
+                        </div>
                     </div>
                 </div>
 
@@ -253,13 +260,24 @@
         const databases = new Databases(client);
         const storage = new Storage(client);
 
-        // Check Session
+        // Initialize: always hide dashboard until session confirmed
+        hideDashboard();
         checkSession();
 
         async function checkSession() {
             try {
-                await account.get();
-                showDashboard();
+                // If no session flag in sessionStorage, we MUST logout to clear Appwrite's persistent cookie
+                if (!sessionStorage.getItem('admin_logged_in')) {
+                    try { await account.deleteSession('current'); } catch (e) { }
+                    hideDashboard();
+                    return;
+                }
+                const user = await account.get();
+                if (user) {
+                    showDashboard();
+                } else {
+                    hideDashboard();
+                }
             } catch (err) {
                 hideDashboard();
             }
@@ -269,12 +287,15 @@
             let emailOrUser = document.getElementById('adminEmail').value;
             const password = document.getElementById('adminPassword').value;
 
+            if (!emailOrUser || !password) return alert('برجاء إدخال البيانات');
+
             if (emailOrUser === 'admin') {
                 emailOrUser = 'admin@artprint.com';
             }
 
             try {
                 await account.createEmailSession(emailOrUser, password);
+                sessionStorage.setItem('admin_logged_in', 'true');
                 showDashboard();
             } catch (err) {
                 alert('خطأ في الدخول: ' + err.message);
@@ -282,8 +303,11 @@
         }
 
         async function logout() {
-            await account.deleteSession('current');
-            location.reload();
+            try {
+                await account.deleteSession('current');
+            } catch (e) { }
+            sessionStorage.removeItem('admin_logged_in');
+            location.href = 'admin.html'; // Force full reset
         }
 
         function showDashboard() {
@@ -450,6 +474,15 @@
         }
 
         async function loadFeedback() {
+            const list = document.getElementById('feedbackList');
+            // Don't clear if updating, just show small indicator if possible, but for now reset is fine
+            list.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--secondary);"></i>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">جاري تحديث الرسائل...</p>
+                </div>
+            `;
+
             try {
                 const response = await databases.listDocuments(
                     APPWRITE_CONFIG.DATABASE_ID,
@@ -457,11 +490,10 @@
                     [Query.orderDesc('date')]
                 );
 
-                const list = document.getElementById('feedbackList');
                 list.innerHTML = '';
 
                 if (response.documents.length === 0) {
-                    list.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">لا توجد رسائل جديدة</p>';
+                    list.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">لا توجد رسائل جديدة</p>';
                     return;
                 }
 
