@@ -37,7 +37,8 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=31000">
+    <link rel="stylesheet" href="style.css?v=28000">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <style>
         .catalog-container {
             padding: 120px 0 60px;
@@ -282,14 +283,19 @@
         <div class="container">
             <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 10px;">
                 <img src="logo.png" alt="Logo" style="height: 50px; border-radius: 50%;">
-                <span>ART <span class="gradient-text">PRINT</span></span>
+                <span>ART <span class="gradient-text">PRINT</span> <small
+                        style="font-size: 0.6rem; color: #888;">v4.1</small></span>
             </a>
-            <a href="index.html" class="btn btn-glass">الرجوع للرئيسية</a>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="location.reload(true)" class="btn btn-glass"
+                    style="padding: 5px 10px; font-size: 0.7rem;">تحديث الكود</button>
+                <a href="index.html" class="btn btn-glass">الرجوع</a>
+            </div>
         </div>
     </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
-    <script src="backend-config.js?v=27000"></script>
+    <script src="backend-config.js?v=9999"></script>
     <script>
         const { Client, Databases, Storage, Query, ID } = Appwrite;
         const client = new Client().setEndpoint(APPWRITE_CONFIG.ENDPOINT).setProject(APPWRITE_CONFIG.PROJECT_ID);
